@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Arquitectura Central",
+  "classifications": [ "Web", "WebAPI", "Microservice" ],
+  "name": "Plantilla Base Microservicio de la Empresa",
+  "description": "Arquitectura limpia con DDD, CQRS (MediatR), JWT, Outbox Pattern, EF Core separado en Persistence. Soporta SQL Server / PostgreSQL y mensajería RabbitMQ opcional.",
+  "identity": "Empresa.Microservicio.Base.Template",
+  "shortName": "arquitectura-base",
+  "language": "C#",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "sourceName": "Company.NameProject",
+  "preferNameDirectory": true,
+
+  "symbols": {
+    "Company": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "MyCompany",
+      "description": "Nombre de la empresa u organización (ej: Acme, Cresa).",
+      "replaces": "Company"
+    },
+    "ProjectName": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "MyProject",
+      "description": "Nombre del microservicio (ej: Orders, Pagos, Inventario).",
+      "replaces": "NameProject"
+    },
+
+    "DatabaseType": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "SQLServer",
+      "description": "Motor de base de datos a utilizar.",
+      "choices": [
+        { "choice": "SQLServer",  "description": "Usa SQL Server con EF Core (Microsoft.EntityFrameworkCore.SqlServer)" },
+        { "choice": "PostgreSQL", "description": "Usa PostgreSQL con EF Core (Npgsql.EntityFrameworkCore.PostgreSQL)" }
+      ]
+    },
+
+    "IsSQLServer": {
+      "type": "computed",
+      "value": "(DatabaseType == \"SQLServer\")"
+    },
+
+    "IsPostgreSQL": {
+      "type": "computed",
+      "value": "(DatabaseType == \"PostgreSQL\")"
+    },
+
+    "IncludeRabbit": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Incluye soporte para mensajería asíncrona con RabbitMQ (IRabbitMqPublisher + RabbitMqPublisher)."
+    }
+  },
+
+  "sources": [
+    {
+      "include": [
+        "src/**",
+        "Company.NameProject.sln"
+      ],
+      "modifiers": [
+        {
+          "exclude": [
+            "**/bin/**",
+            "**/obj/**",
+            "**/.vs/**"
+          ]
+        },
+        {
+          "condition": "(!IncludeRabbit)",
+          "exclude": [
+            "src/Infrastructure/Company.NameProject.Infrastructure/Messaging/**"
+          ]
+        }
+      ]
+    }
+  ]
+}

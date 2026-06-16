@@ -1,0 +1,11 @@
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Shared\bin\Debug\net9.0\Company.NameProject.Shared.deps.json
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Shared\bin\Debug\net9.0\Company.NameProject.Shared.dll
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Shared\bin\Debug\net9.0\Company.NameProject.Shared.pdb
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Shared\obj\Debug\net9.0\Company.NameProject.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Shared\obj\Debug\net9.0\Company.NameProject.Shared.AssemblyInfoInputs.cache
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Shared\obj\Debug\net9.0\Company.NameProject.Shared.AssemblyInfo.cs
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Shared\obj\Debug\net9.0\Company.NameProject.Shared.csproj.CoreCompileInputs.cache
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Shared\obj\Debug\net9.0\Company.NameProject.Shared.dll
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Shared\obj\Debug\net9.0\refint\Company.NameProject.Shared.dll
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Shared\obj\Debug\net9.0\Company.NameProject.Shared.pdb
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Shared\obj\Debug\net9.0\ref\Company.NameProject.Shared.dll

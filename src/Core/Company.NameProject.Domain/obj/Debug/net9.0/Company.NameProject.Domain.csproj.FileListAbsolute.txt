@@ -1,0 +1,15 @@
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\bin\Debug\net9.0\Company.NameProject.Domain.deps.json
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\bin\Debug\net9.0\Company.NameProject.Domain.dll
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\bin\Debug\net9.0\Company.NameProject.Domain.pdb
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\bin\Debug\net9.0\Company.NameProject.Shared.dll
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\bin\Debug\net9.0\Company.NameProject.Shared.pdb
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\obj\Debug\net9.0\Company.NameProject.Domain.csproj.AssemblyReference.cache
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\obj\Debug\net9.0\Company.NameProject.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\obj\Debug\net9.0\Company.NameProject.Domain.AssemblyInfoInputs.cache
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\obj\Debug\net9.0\Company.NameProject.Domain.AssemblyInfo.cs
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\obj\Debug\net9.0\Company.NameProject.Domain.csproj.CoreCompileInputs.cache
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\obj\Debug\net9.0\Company..19EAC323.Up2Date
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\obj\Debug\net9.0\Company.NameProject.Domain.dll
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\obj\Debug\net9.0\refint\Company.NameProject.Domain.dll
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\obj\Debug\net9.0\Company.NameProject.Domain.pdb
+C:\IA - CRESA\BaseArchitecture\src\Core\Company.NameProject.Domain\obj\Debug\net9.0\ref\Company.NameProject.Domain.dll

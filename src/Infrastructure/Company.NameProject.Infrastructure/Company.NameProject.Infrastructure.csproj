@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.4" />
+    <PackageReference Include="MediatR" Version="14.1.0" />
+    <!--#if (IsSQLServer)-->
+    <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="9.0.0" />
+    <!--#endif-->
+    <!--#if (IsPostgreSQL)-->
+    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
+    <!--#endif-->
+    <!--#if (IncludeRabbit)-->
+    <PackageReference Include="RabbitMQ.Client" Version="7.1.2" />
+    <!--#endif-->
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Company.NameProject.Application\Company.NameProject.Application.csproj" />
+    <ProjectReference Include="..\..\Core\Company.NameProject.Domain\Company.NameProject.Domain.csproj" />
+    <ProjectReference Include="..\..\Core\Company.NameProject.Shared\Company.NameProject.Shared.csproj" />
+    <ProjectReference Include="..\Company.NameProject.Persistence\Company.NameProject.Persistence.csproj" />
+  </ItemGroup>
+</Project>
+

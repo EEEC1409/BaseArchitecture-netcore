@@ -28,7 +28,7 @@ dotnet new install "ruta_aqui\BaseArchitecture-netcore"
 Para generar un nuevo proyecto con la configuración inicial estándar, ejecuta:
 
 ```bash
-dotnet new arquitectura-base -n "Acme.Pagos" --Company Cresa --ProjectName Pagos --DatabaseType SQLServer --IncludeRabbit false
+dotnet new arquitectura-base -n "Acme.Pagos" --Company Cresa --ProjectName Pagos --DatabaseType SQLServer --IncludeRabbit false -f net8.0
 ```
 * arquitectura-base, este nombre esta en el template del proyecto base
     

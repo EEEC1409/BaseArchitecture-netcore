@@ -63,7 +63,11 @@
     {
       "include": [
         "src/**",
-        "Company.NameProject.sln"
+        "Company.NameProject.sln",
+        "**/*.md",
+        "**/*.txt",
+        ".github/**",
+        ".template.config/**"
       ],
       "modifiers": [
         {

@@ -28,7 +28,7 @@ dotnet new install "C:\ruta_del_fuente"
 Para generar un nuevo proyecto con la configuración inicial estándar, ejecuta:
 
 ```bash
-dotnet new cresa-arch -n "Cresa.Pagos" --Company "Cresa" --ProjectName "Pagos"
+dotnet new cresa-arch -n "Cresa.Pagos" --Company "Cresa" --ProjectName "Pagos" -f net8.0
 ```
 
 ### Resultado de Namespaces

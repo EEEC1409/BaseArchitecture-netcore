@@ -1,5 +1,6 @@
 using Company.NameProject.Application.CQRS.Commands.Clientes.Crear;
 using Company.NameProject.Application.CQRS.Queries.Cliente;
+using Company.NameProject.Shared.Common;
 using Company.NameProject.Shared.Exceptions;
 
 using MediatR;
@@ -29,10 +30,10 @@ namespace Company.NameProject.WebApi
         }
 
         [HttpGet]
-        public async Task<IActionResult> Listar()
+        public async Task<IActionResult> Listar([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
         {
-            var clientes = await _mediator.Send(new ListarClientesQuery());
-            return Ok(ApiResponse<List<ClienteDto>>.Success(clientes));
+            var resultado = await _mediator.Send(new ListarClientesQuery(page, pageSize));
+            return Ok(ApiResponse<PagedResult<ClienteDto>>.Success(resultado));
         }
 
         [HttpGet("{cedula}")]

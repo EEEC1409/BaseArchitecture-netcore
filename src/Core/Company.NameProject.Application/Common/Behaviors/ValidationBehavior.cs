@@ -25,8 +25,10 @@ namespace Company.NameProject.Application.Common.Behaviors
 
             var context = new ValidationContext<TRequest>(request);
 
-            var failures = _validators
-                .Select(v => v.Validate(context))
+            var results = await Task.WhenAll(
+                _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+
+            var failures = results
                 .SelectMany(r => r.Errors)
                 .Where(e => e is not null)
                 .ToList();

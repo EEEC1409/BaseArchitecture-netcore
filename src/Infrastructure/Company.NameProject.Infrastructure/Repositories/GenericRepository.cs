@@ -1,6 +1,7 @@
 using Company.NameProject.Domain.Common;
 using Company.NameProject.Domain.Repositories;
 using Company.NameProject.Persistence;
+using Company.NameProject.Shared.Common;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,17 @@ namespace Company.NameProject.Infrastructure.Repositories
 
         public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
             => await _context.Set<T>().ToListAsync(cancellationToken);
+
+        public async Task<PagedResult<T>> GetPagedAsync(int page, int pageSize, CancellationToken cancellationToken = default)
+        {
+            var totalCount = await _context.Set<T>().CountAsync(cancellationToken);
+            var items = await _context.Set<T>()
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return new PagedResult<T>(items, totalCount, page, pageSize);
+        }
 
         public IQueryable<T> Find(Expression<Func<T, bool>> expression)
             => _context.Set<T>().Where(expression);

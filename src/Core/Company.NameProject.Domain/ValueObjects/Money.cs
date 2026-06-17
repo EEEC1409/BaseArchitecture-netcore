@@ -1,14 +1,8 @@
 using Company.NameProject.Domain.Common;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Company.NameProject.Domain.ValueObjects
 {
-    public class Money
+    public sealed class Money : IEquatable<Money>
     {
         public decimal Amount { get; }
         public string Currency { get; }
@@ -24,7 +18,10 @@ namespace Company.NameProject.Domain.ValueObjects
             if (amount < 0)
                 throw new DomainException("Monto inválido");
 
-            return new Money(amount, currency);
+            if (string.IsNullOrWhiteSpace(currency))
+                throw new DomainException("Moneda requerida");
+
+            return new Money(amount, currency.ToUpperInvariant());
         }
 
         public Money Sumar(Money otro)
@@ -34,5 +31,19 @@ namespace Company.NameProject.Domain.ValueObjects
 
             return new Money(Amount + otro.Amount, Currency);
         }
+
+        public bool Equals(Money? other) =>
+            other is not null && Amount == other.Amount && Currency == other.Currency;
+
+        public override bool Equals(object? obj) => obj is Money other && Equals(other);
+
+        public override int GetHashCode() => HashCode.Combine(Amount, Currency);
+
+        public override string ToString() => $"{Amount} {Currency}";
+
+        public static bool operator ==(Money? left, Money? right) =>
+            left is null ? right is null : left.Equals(right);
+
+        public static bool operator !=(Money? left, Money? right) => !(left == right);
     }
 }

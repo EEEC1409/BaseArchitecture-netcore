@@ -21,7 +21,7 @@ git clone https://github.com/EEEC1409/BaseArchitecture-netcore.git
 Instala la plantilla en tu CLI de .NET de forma local apuntando a la ruta de origen:
 
 ```bash
-dotnet new install "ruta_aqui\BaseArchitecture-netcore"
+dotnet new install "ruta_descarga\BaseArchitecture-netcore"
 ```
 
 ## 3. Crear nuevo proyecto
@@ -31,10 +31,10 @@ Para generar un nuevo proyecto con la configuración inicial estándar, ejecuta:
 dotnet new arquitectura-base -n "Cresa.XXXXXXX" --Company Cresa --ProjectName XXXXXXX --DatabaseType SQLServer --IncludeRabbit false
 ```
 * arquitectura-base, este nombre esta en el template del proyecto base
-* `-n` Es el nombre de la carpeta que contendrá todo el proyecto
-* `--Company` nombre del empresa que va como prefijo
-* `--ProjectName` nombre del proyecto/aplicación a crear
-* `--DatabaseType` tipo de base de datos
+* **-n** Es el nombre de la carpeta que contendrá todo el proyecto
+* **--Company** nombre del empresa que va como prefijo
+* **--ProjectName** nombre del proyecto/aplicación a crear
+* **--DatabaseType** tipo de base de datos
 
 ### Resultado de Namespaces
 El motor de plantillas renombrará automáticamente todas las referencias:

@@ -1,5 +1,4 @@
 using Company.NameProject.Application.Common.Behaviors;
-using Company.NameProject.Application.CQRS.Commands.Clientes.Crear;
 
 using FluentValidation;
 
@@ -13,7 +12,9 @@ namespace Company.NameProject.Application
     {
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            var assembly = typeof(CrearClienteHandler).Assembly;
+            // Usar el assembly actual como ancla de registro.
+            // Al agregar handlers, este assembly los registrará automáticamente.
+            var assembly = typeof(DependencyInjection).Assembly;
 
             services.AddMediatR(cfg =>
             {

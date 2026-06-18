@@ -1,5 +1,4 @@
 using Company.NameProject.Application.Common.Interfaces;
-using Company.NameProject.Domain.Repositories;
 using Company.NameProject.Infrastructure.Repositories;
 using Company.NameProject.Infrastructure.Services;
 using Company.NameProject.Persistence;
@@ -21,9 +20,10 @@ namespace Company.NameProject.Infrastructure
             // Persistence layer
             services.AddPersistence(configuration);
 
-            // Repositories
-            services.AddScoped<IClienteRepositorio, ClienteRepositorio>();
-            services.AddScoped<IPedidoRepositorio, PedidoRepositorio>();
+            // TODO: Registrar repositorios específicos al implementar las entidades de negocio.
+            // Ejemplo:
+            // services.AddScoped<IClienteRepositorio, ClienteRepositorio>();
+            // services.AddScoped<IPedidoRepositorio, PedidoRepositorio>();
 
             // Utilities
             services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();

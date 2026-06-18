@@ -83,6 +83,7 @@
     {
       "include": [
         "src/**",
+        "tests/**",
         "Company.NameProject.sln",
         "**/*.md",
         "**/*.txt",

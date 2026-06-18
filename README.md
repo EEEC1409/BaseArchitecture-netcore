@@ -138,3 +138,6 @@ Una vez creado el proyecto, compílalo y ejecútalo siguiendo estos comandos:
    ```
 4. **Verificar Swagger:** 
 Abre tu navegador e ingresa a `https://localhost:55831/swagger` para probar los endpoints y autenticarte con JWT.
+
+4. **Observacion:**
+Esto es una plantilla de proyecto, por lo cual deben revisar el appsetting para realizar los ajustes correspondiente como por ejemplo la cadena de conexión, la llave de JWT. 

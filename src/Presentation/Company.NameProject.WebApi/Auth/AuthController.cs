@@ -4,8 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Company.NameProject.WebApi.Auth
 {
+    /// <summary>
+    /// Gestiona la autenticación de usuarios y la emisión de tokens JWT.
+    /// </summary>
     [ApiController]
     [Route("api/auth")]
+    [Produces("application/json")]
     public class AuthController : ControllerBase
     {
         private readonly IJwtTokenService _tokenService;
@@ -16,10 +20,23 @@ namespace Company.NameProject.WebApi.Auth
         }
 
         /// <summary>
-        /// Genera un JWT para el usuario autenticado.
-        /// Reemplaza la lógica de validación de credenciales con tu repositorio de usuarios.
+        /// Autentica al usuario y devuelve un token JWT Bearer.
         /// </summary>
+        /// <remarks>
+        /// **Credenciales de demo:**
+        ///
+        ///     Admin → username: admin   | password: Admin123!
+        ///     User  → username: user    | password: User123!
+        ///
+        /// Reemplaza <c>IsValidUser</c> con la validación real contra tu repositorio de usuarios.
+        /// </remarks>
+        /// <param name="request">Credenciales del usuario.</param>
+        /// <returns>Token JWT Bearer listo para usar en el header <c>Authorization</c>.</returns>
+        /// <response code="200">Login exitoso. Retorna el token JWT.</response>
+        /// <response code="401">Credenciales inválidas.</response>
         [HttpPost("login")]
+        [ProducesResponseType(typeof(ApiResponse<LoginResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
         public IActionResult Login([FromBody] LoginRequest request)
         {
             // TODO: Reemplazar con validación real contra base de datos

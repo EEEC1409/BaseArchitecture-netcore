@@ -1,6 +1,7 @@
 using Company.NameProject.WebApi.Auth;
 using Company.NameProject.WebApi.Middleware;
 using Company.NameProject.WebApi.Options;
+using Company.NameProject.WebApi.Swagger;
 using Company.NameProject.Application;
 using Company.NameProject.Infrastructure;
 
@@ -70,8 +71,9 @@ try
 
     // ASP.NET
     builder.Services.AddControllers();
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+
+    // Swagger con JWT y documentación XML
+    builder.Services.AddSwaggerWithJwt(builder.Configuration);
 
     var app = builder.Build();
 
@@ -79,11 +81,8 @@ try
     app.UseMiddleware<ExceptionMiddleware>();
     app.UseSerilogRequestLogging();
 
-    if (app.Environment.IsDevelopment())
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI();
-    }
+    // Swagger (todos los entornos — ajustar según política)
+    app.UseSwaggerWithJwt();
 
     app.UseHttpsRedirection();
     app.UseCors();

@@ -31,10 +31,10 @@ Para generar un nuevo proyecto con la configuración inicial estándar, ejecuta:
 dotnet new arquitectura-base -n "Cresa.XXXXXXX" --Company Cresa --ProjectName XXXXXXX --DatabaseType SQLServer --IncludeRabbit false
 ```
 * arquitectura-base, este nombre esta en el template del proyecto base
-* -n: Es el nombre de la carpeta que contendrá todo el proyecto
-* --Company: nombre del empresa que va como prefijo
-* --ProjectName: nombre del proyecto/aplicación a crear
-* --DatabaseType: tipo de base de datos
+* `-n` Es el nombre de la carpeta que contendrá todo el proyecto
+* `--Company` nombre del empresa que va como prefijo
+* `--ProjectName` nombre del proyecto/aplicación a crear
+* `--DatabaseType` tipo de base de datos
 
 ### Resultado de Namespaces
 El motor de plantillas renombrará automáticamente todas las referencias:
@@ -136,4 +136,5 @@ Una vez creado el proyecto, compílalo y ejecútalo siguiendo estos comandos:
    ```bash
    dotnet run
    ```
-4. **Verificar Swagger:** Abre tu navegador e ingresa a `https://localhost:55831/swagger` para probar los endpoints y autenticarte con JWT.
+4. **Verificar Swagger:** 
+Abre tu navegador e ingresa a `https://localhost:55831/swagger` para probar los endpoints y autenticarte con JWT.

@@ -56,6 +56,26 @@
       "datatype": "bool",
       "defaultValue": "true",
       "description": "Incluye soporte para mensajería asíncrona con RabbitMQ (IRabbitMqPublisher + RabbitMqPublisher)."
+    },
+
+    "ConnectionStringValue": {
+      "type": "generated",
+      "generator": "switch",
+      "replaces": "Server=localhost;Database=MiBaseDatos;Trusted_Connection=True;TrustServerCertificate=True;",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "string",
+        "cases": [
+          {
+            "condition": "(IsPostgreSQL)",
+            "value": "Host=localhost;Port=5432;Database=MiBaseDatos;Username=postgres;Password=postgres"
+          },
+          {
+            "condition": "(IsSQLServer)",
+            "value": "Server=localhost;Database=MiBaseDatos;Trusted_Connection=True;TrustServerCertificate=True;"
+          }
+        ]
+      }
     }
   },
 

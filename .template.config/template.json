@@ -58,6 +58,13 @@
       "description": "Incluye soporte para mensajería asíncrona con RabbitMQ (IRabbitMqPublisher + RabbitMqPublisher)."
     },
 
+    "IncludeEureka": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "description": "Incluye descubrimiento de servicios con Steeltoe/Eureka (Steeltoe.Discovery.ClientCore + Steeltoe.Discovery.Eureka). Registra el servicio dinámicamente al arrancar."
+    },
+
     "ConnectionStringValue": {
       "type": "generated",
       "generator": "switch",

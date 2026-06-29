@@ -1,0 +1,32 @@
+version: "3.8"
+
+# ── docker-compose-deploy.yml ─────────────────────────────────────────────────
+# Archivo de deploy concreto para Docker Swarm (QA / Producción).
+# A diferencia de docker-compose-template.yml, aquí los valores ya están fijos.
+# Actualiza imagen y versión antes de cada release.
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  api:
+    image: 192.168.x.x:5000/nameproject-service:1.0.0
+    networks:
+      - docker-cresa-attachable
+    environment:
+      ASPNETCORE_ENVIRONMENT: QA
+
+    deploy:
+      mode: replicated
+      replicas: 2
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+
+networks:
+  docker-cresa-attachable:
+    external: true

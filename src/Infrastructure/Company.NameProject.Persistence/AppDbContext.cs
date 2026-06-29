@@ -1,4 +1,3 @@
-using Company.NameProject.Domain.Common;
 using Company.NameProject.Domain.Entities.Events;
 using Company.NameProject.Persistence.Entities;
 

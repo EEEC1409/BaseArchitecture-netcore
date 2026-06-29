@@ -6,23 +6,36 @@ namespace Company.NameProject.Domain.Tests.Common;
 
 public class AggregateRootTests
 {
-    // Clase concreta de apoyo para tests
+    // ─── Helpers de apoyo ───────────────────────────────────────────────────
+
     private sealed class TestAggregate : AggregateRoot
     {
         public TestAggregate(Guid id) => Id = id;
         public void Publicar(INotification evento) => AddEvent(evento);
     }
 
+    private sealed class TestAggregateLong : AggregateRootLong
+    {
+        public TestAggregateLong(long id) => Id = id;
+        public void Publicar(INotification evento) => AddEvent(evento);
+    }
+
+    private sealed class TestAggregateInt : AggregateRootInt
+    {
+        public TestAggregateInt(int id) => Id = id;
+        public void Publicar(INotification evento) => AddEvent(evento);
+    }
+
     private record TestEvent(string Descripcion) : INotification;
 
-    // ─── Events ─────────────────────────────────────────────────────────────
+    // ─── DomainEvents (Guid) ────────────────────────────────────────────────
 
     [Fact]
     public void NuevoAggregateRoot_NoTieneDomainEvents()
     {
         var aggregate = new TestAggregate(Guid.NewGuid());
 
-        aggregate.Events.Should().BeEmpty();
+        aggregate.DomainEvents.Should().BeEmpty();
     }
 
     [Fact]
@@ -33,7 +46,7 @@ public class AggregateRootTests
 
         aggregate.Publicar(evento);
 
-        aggregate.Events.Should().ContainSingle()
+        aggregate.DomainEvents.Should().ContainSingle()
             .Which.Should().Be(evento);
     }
 
@@ -47,9 +60,9 @@ public class AggregateRootTests
         aggregate.Publicar(e1);
         aggregate.Publicar(e2);
 
-        aggregate.Events.Should().HaveCount(2);
-        aggregate.Events.ElementAt(0).Should().Be(e1);
-        aggregate.Events.ElementAt(1).Should().Be(e2);
+        aggregate.DomainEvents.Should().HaveCount(2);
+        aggregate.DomainEvents.ElementAt(0).Should().Be(e1);
+        aggregate.DomainEvents.ElementAt(1).Should().Be(e2);
     }
 
     [Fact]
@@ -60,10 +73,10 @@ public class AggregateRootTests
 
         aggregate.ClearEvents();
 
-        aggregate.Events.Should().BeEmpty();
+        aggregate.DomainEvents.Should().BeEmpty();
     }
 
-    // ─── Identidad (heredada de Entity<Guid>) ───────────────────────────────
+    // ─── Identidad Guid ─────────────────────────────────────────────────────
 
     [Fact]
     public void DosAggregates_ConMismoId_SonIguales()
@@ -82,5 +95,65 @@ public class AggregateRootTests
         var b = new TestAggregate(Guid.NewGuid());
 
         a.Should().NotBe(b);
+    }
+
+    // ─── AggregateRootLong (long) ────────────────────────────────────────────
+
+    [Fact]
+    public void AggregateRootLong_SoportaIdTipoLong()
+    {
+        var aggregate = new TestAggregateLong(100L);
+
+        aggregate.Id.Should().Be(100L);
+        (aggregate.Id is long).Should().BeTrue();
+    }
+
+    [Fact]
+    public void AggregateRootLong_DomainEvents_FuncionaIgual()
+    {
+        var aggregate = new TestAggregateLong(1L);
+        aggregate.Publicar(new TestEvent("Long event"));
+
+        aggregate.DomainEvents.Should().ContainSingle();
+
+        aggregate.ClearEvents();
+        aggregate.DomainEvents.Should().BeEmpty();
+    }
+
+    // ─── AggregateRootInt (int) ──────────────────────────────────────────────
+
+    [Fact]
+    public void AggregateRootInt_SoportaIdTipoInt()
+    {
+        var aggregate = new TestAggregateInt(42);
+
+        aggregate.Id.Should().Be(42);
+        (aggregate.Id is int).Should().BeTrue();
+    }
+
+    [Fact]
+    public void AggregateRootInt_DomainEvents_FuncionaIgual()
+    {
+        var aggregate = new TestAggregateInt(1);
+        aggregate.Publicar(new TestEvent("Int event"));
+
+        aggregate.DomainEvents.Should().ContainSingle();
+
+        aggregate.ClearEvents();
+        aggregate.DomainEvents.Should().BeEmpty();
+    }
+
+    // ─── IHasDomainEvents (polimorfismo) ────────────────────────────────────
+
+    [Fact]
+    public void TodosLosAggregates_ImplementanIHasDomainEvents()
+    {
+        var guid  = new TestAggregate(Guid.NewGuid());
+        var longA = new TestAggregateLong(1L);
+        var intA  = new TestAggregateInt(1);
+
+        guid.Should().BeAssignableTo<Domain.Entities.Events.IHasDomainEvents>();
+        longA.Should().BeAssignableTo<Domain.Entities.Events.IHasDomainEvents>();
+        intA.Should().BeAssignableTo<Domain.Entities.Events.IHasDomainEvents>();
     }
 }

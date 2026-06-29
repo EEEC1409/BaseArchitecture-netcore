@@ -1,5 +1,5 @@
 using Company.NameProject.Application.Common.Interfaces;
-using Company.NameProject.Domain.Common;
+using Company.NameProject.Domain.Entities.Events;
 using Company.NameProject.Persistence.Entities;
 
 using System.Text.Json;
@@ -19,15 +19,17 @@ namespace Company.NameProject.Persistence
 
         public Task DispatchAsync()
         {
+            // Usa IHasDomainEvents en lugar de AggregateRoot para capturar
+            // entidades con cualquier tipo de ID (Guid, long, int)
             var entities = _context.ChangeTracker
-                .Entries<AggregateRoot>()
+                .Entries<IHasDomainEvents>()
                 .Select(e => e.Entity)
-                .Where(e => e.Events.Any())
+                .Where(e => e.DomainEvents.Any())
                 .ToList();
 
             foreach (var entity in entities)
             {
-                foreach (var domainEvent in entity.Events)
+                foreach (var domainEvent in entity.DomainEvents)
                 {
                     _context.Outbox.Add(new OutboxMessage
                     {
@@ -46,4 +48,3 @@ namespace Company.NameProject.Persistence
         }
     }
 }
-

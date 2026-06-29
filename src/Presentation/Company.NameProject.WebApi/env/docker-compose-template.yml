@@ -1,0 +1,35 @@
+version: "3.8"
+
+# ── docker-compose-template.yml ───────────────────────────────────────────────
+# Plantilla para deploy en Docker Swarm.
+# Variables sustituidas por los scripts release-swarm-*.ps1:
+#   ${REGISTRY}   → Registry Docker local  (ej. 192.168.x.x:5000)
+#   ${IMAGEN}     → Nombre de la imagen     (ej. nameproject-service)
+#   ${VERSION}    → Versión semántica       (ej. 1.2.3)
+#   ${envName}    → Entorno ASP.NET Core    (Development | QA | Production)
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  api:
+    image: ${REGISTRY}/${IMAGEN}:${VERSION}
+    networks:
+      - docker-cresa-attachable
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${envName}
+
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+
+networks:
+  docker-cresa-attachable:
+    external: true

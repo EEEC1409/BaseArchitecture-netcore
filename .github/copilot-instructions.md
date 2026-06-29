@@ -8,6 +8,69 @@ Cada vez que el usuario te pida iniciar una tarea o funcionalidad, antes de modi
 ## REGLA DE COMUNICACIÓN:
 Antes de escribir o modificar cualquier archivo en el disco, debes listar en el chat un resumen en viñetas de TODOS los archivos que vas a crear en Domain, Application, Infrastructure y Presentation para que yo los valide.
 
+### Convenciones en el Código C# (Backend)
+* **PascalCase:** Utilizado para todas las propiedades públicas, nombres de clases y métodos de la API.
+  * *Ejemplo:* `public int ClienteId { get; set; }`, `public string NombreUsuario { get; set; }`
+* **camelCase:** Utilizado exclusivamente para parámetros de métodos y variables locales.
+  * *Ejemplo:* `public async Task<IActionResult> ObtenerPago(int pagoId)`
+* **Evitar abreviaturas:** Los nombres de las propiedades deben ser descriptivos y claros. No uses siglas confusas a menos que pertenezcan a la terminología estándar del negocio.
+
+### Convenciones en la Capa de Presentación (JSON / API Endpoints)
+* **camelCase (Estándar de API moderna):** Al serializar las respuestas HTTP o recibir payloads en los controladores, las propiedades de C# se transformarán automáticamente a formato camelCase (primera letra en minúscula).
+  * *C#:* `MontoTotal` $\rightarrow$ *JSON:* `"montoTotal"`
+  * *C#:* `FechaTransaccion` $\rightarrow$ *JSON:* `"fechaTransaccion"`
+
+## Estructura de Respuesta para Recursos No Encontrados (Ejemplo: Vendedor No Existe)
+
+Cuando se consulta un vendedor y este no se encuentra en el sistema, la API debe mantener la consistencia del objeto global de respuesta, retornando un código de estado HTTP exitoso, pero con la propiedad `data` mapeada como vacía o nula.
+
+A continuación se detalla la estructura JSON exacta que debe devolver el endpoint:
+
+```json
+{
+  "token": "c9f95139-1960-40fa-b506-0014e1f36b76",
+  "statusCode": 200,
+  "messages": [
+    "No existe información para el criterio de búsqueda proporcionado."
+  ],
+  "data": null
+}
+```
+```json
+{
+  "token": "c9f95139-1960-40fa-b506-0014e1f36b76",
+  "statusCode": 200,
+  "messages": [
+    "OK"
+  ],
+  "data": {
+    "existe": false,
+    "id": 1,
+    "usuario": "0920578762",
+    "anio": 2026,
+    "mes": 5,
+    "fechaAceptacion": "2026-05-01T00:00:00"
+  }
+}
+```
+```json
+{
+  "token": "c9f95139-1960-40fa-b506-0014e1f36b76",
+  "statusCode": 500,
+  "messages": [
+    "Error en la aplicación: No se pudo procesar la solicitud debido a un error interno del servidor."
+  ],
+  "data":  null
+}
+```
+
+### Especificaciones del Objeto de Respuesta:
+* **`token`**: Un identificador único global (GUID) generado por la API para fines de trazabilidad y auditoría de la petición.
+* **`statusCode`**: Código numérico de estado que refleja la correcta ejecución del canal de comunicación (en este escenario, se mantiene un `500` ya que ocurrió un error interno del servidor).
+* **`messages`**: Un arreglo de textos informativos. En casos donde no hay error técnico, se devolverá la confirmación estándar `["OK"]` o un mensaje personalizado según las reglas de negocio establecidas.
+* **`data`**: Cuerpo principal del resultado de la consulta. Al no existir el vendedor en la base de datos, este campo se establece estrictamente en **`null`**.
+
+
 ## 1. Mapa de la Estructura de Proyectos y Responsabilidades
 Cuando generes o modifiques archivos, debes ubicarlos exactamente en los siguientes namespaces y rutas lógicas basados en `src/` y `test/`:
 

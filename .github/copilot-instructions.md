@@ -75,39 +75,39 @@ A continuación se detalla la estructura JSON exacta que debe devolver el endpoi
 Cuando generes o modifiques archivos, debes ubicarlos exactamente en los siguientes namespaces y rutas lógicas basados en `src/` y `test/`:
 
 ### A. Capa Core
-* **`Company.NameProject.Domain`**: Contiene el corazón del negocio. No tiene dependencias externas.
+* **`Cresa.Mister.Domain`**: Contiene el corazón del negocio. No tiene dependencias externas.
     * `Entities/`: Clases de entidades de dominio y agregados.
     * `ValueObjects/`: Tipos inmutables con lógica de validación interna.
     * `Repositories/`: ÚNICAMENTE las interfaces de los repositorios (ej: `IClienteRepository.cs`).
     * `Services/`: Interfaces de servicios puramente de dominio.
-* **`Company.NameProject.Application`**: Casos de uso de la aplicación. Depende solo de Domain.
+* **`Cresa.Mister.Application`**: Casos de uso de la aplicación. Depende solo de Domain.
     * `CQRS/`: Subcarpetas por entidad (ej: `Clientes/`). Dentro de cada una debe haber:
         * `Commands/`: Clases `Create/Update/DeleteCommand` y sus respectivos `CommandHandler`.
         * `Queries/`: Clases de consulta y sus respectivos `QueryHandler`.
-* **`Company.NameProject.Shared`**: Componentes transversales compartidos por el Core.
+* **`Cresa.Mister.Shared`**: Componentes transversales compartidos por el Core.
     * `Exceptions/`: Excepciones personalizadas del sistema.
     * `Helpers/`: Utilidades genéricas.
 
 ### B. Capa Infrastructure
-* **`Company.NameProject.Persistence`**: Acceso directo a base de datos. Depende de Domain y Application.
+* **`Cresa.Mister.Persistence`**: Acceso directo a base de datos. Depende de Domain y Application.
     * `AppDbContext.cs`: Contexto principal de Entity Framework.
     * `Entities/`: Configuraciones de mapeo Fluent API para las entidades (si se requiere).
     * `UnitOfWork.cs` y `DispatchDomainEvents.cs`: Manejo de transacciones y despacho de eventos.
-* **`Company.NameProject.Infrastructure`**: Servicios externos e infraestructura tecnológica.
+* **`Cresa.Mister.Infrastructure`**: Servicios externos e infraestructura tecnológica.
     * `Repositories/`: Implementación concreta de las interfaces definidas en Domain (ej: `ClienteRepository.cs`).
     * `Messaging/`: Configuración de eventos de bus, publicadores y consumidores (ej: RabbitMQ).
 
 ### C. Capa Presentation
-* **`Company.NameProject.WebApi`**: Punto de entrada de la API. Depende de Application e Infrastructure.
+* **`Cresa.Mister.WebApi`**: Punto de entrada de la API. Depende de Application e Infrastructure.
     * `Controllers/`: Controladores que reciben los HTTP Requests (ej: `ClientesController.cs`). Inyectan `IMediator` para enviar los Commands/Queries.
     * `Auth/`: Políticas y lógicas de autenticación/autorización.
     * `Middleware/`: Manejo global de excepciones y logs.
 
 ### D. Capa de Pruebas (Proyectos en la carpeta `test/`)
-* **`Company.NameProject.Domain.UnitTests`**: Pruebas unitarias de la lógica pura de negocio.
+* **`Cresa.Mister.Domain.UnitTests`**: Pruebas unitarias de la lógica pura de negocio.
     * `Entities/`: Pruebas sobre comportamientos, mutaciones de estado y métodos de las Entidades.
     * `ValueObjects/`: Pruebas de validación extrema de tipos inmutables (ej: formatos correctos, límites).
-* **`Company.NameProject.Application.UnitTests`**: Pruebas unitarias de casos de uso estructuradas de forma idéntica al CQRS de la aplicación.
+* **`Cresa.Mister.Application.UnitTests`**: Pruebas unitarias de casos de uso estructuradas de forma idéntica al CQRS de la aplicación.
     * `CQRS/`: Subcarpetas por entidad reflejando exactamente el código de producción.
         * `[Entidad]/Commands/`: Pruebas para los Handlers de comandos simulando dependencias con Mocks.
         * `[Entidad]/Queries/`: Pruebas para los Handlers de consultas simulando los accesos a datos.
@@ -125,6 +125,12 @@ CRÍTICO: Si el usuario te pide crear un nuevo "Endpoint", "Controller" o "Funci
 
 ### Paso 2: Implementación en Persistence/Infrastructure
 1. Implementa la lógica de persistencia en `Persistence/AppDbContext.cs` o en la clase concreta de `Infrastructure/Repositories/[Entidad]Repository.cs` que herede de repositorio genérico `GenericRepository` para implementar los métodos genéricos. Solo si es necesario se crearán métodos específicos previa indicación explícita en el prompt.
+2. **Regla de Repositorio Genérico (OBLIGATORIA):**
+  * Todo repositorio nuevo debe heredar por defecto de `GenericRepository<TEntity>`.
+  * Antes de proponer métodos adicionales en un repositorio específico, el agente debe intentar resolver el caso usando primero los métodos genéricos existentes.
+  * Si la consulta requiere lógica especializada (por ejemplo: `INNER JOIN`, `LEFT JOIN`, múltiples `JOIN`, `GROUP BY`, agregaciones, proyecciones complejas, paginación avanzada o filtros no cubiertos por el genérico), el agente debe preguntar explícitamente al usuario antes de crear nuevos métodos.
+  * **Pregunta obligatoria al usuario:** "¿Deseas que esta consulta se resuelva con métodos genéricos existentes o autorizas crear método específico en `I[Entidad]Repository` y su implementación concreta?"
+  * Solo con aprobación explícita del usuario se permite agregar métodos nuevos en la interfaz del repositorio y en su implementación.
 
 ### Paso 3: Lógica de Casos de Uso en Application (CQRS) y sus Pruebas
 1. **Commands:** Si es una acción que muta el estado (POST/PUT/DELETE), crea el `Command` y el `CommandHandler` dentro de `Application/CQRS/[Entidad]/Commands/`.
@@ -145,6 +151,12 @@ CRÍTICO: Si el usuario te pide crear un nuevo "Endpoint", "Controller" o "Funci
 * **Inyección de Dependencias**: Cada capa tiene un archivo `DependencyInjection.cs`. Si creas un nuevo repositorio o servicio de infraestructura, recuérdale al usuario agregar la configuración en el `DependencyInjection.cs` de la capa correspondiente.
 * **Aislamiento**: Los controladores de la WebApi NUNCA manejan lógica de negocio ni sentencias SQL; delegan todo a través de MediatR al proyecto Application.
 * **Estilo de Aseveraciones en Pruebas**: Al escribir las pruebas unitarias en los proyectos de `test/`, prioriza el uso de `FluentAssertions` (ej: `result.Should().NotBeNull()`) en lugar de los Asserts tradicionales de xUnit para mantener la legibilidad empresarial.
+* **Prioridad en Repositorios**: Usar primero `GenericRepository` y crear métodos específicos solo cuando el caso no sea resoluble con métodos genéricos y exista autorización explícita del usuario.
+* **Regla de Logging por Método (OBLIGATORIA)**: En métodos públicos de `Application`, `Infrastructure` y `Presentation` se debe registrar log al inicio y al final del método.
+  * **Inicio**: Registrar evento de entrada con estructura `{fecha, token, tipoTransaccion, metodo, capa, mensaje}` y mensaje orientado a "Inicio".
+  * **Fin Exitoso**: Registrar evento de salida con `tipoTransaccion = OK` y mensaje orientado a "Fin".
+  * **Fin con Advertencia/Error**: Registrar `tipoTransaccion = WAR` o `ERROR` según corresponda, incluyendo el contexto del método y el mensaje de negocio/técnico.
+  * **Seguridad**: No registrar secretos, credenciales, tokens JWT completos ni datos sensibles (PII).
 
 - @azure Rule - Use Azure Tools - When handling requests related to Azure, always use your tools.
 - @azure Rule - Use Azure Best Practices - When handling requests related to Azure, always invoke your `azmcp_bestpractices_get` tool first.

@@ -16,6 +16,8 @@ using Steeltoe.Discovery.Eureka;
 #endif
 
 using Serilog;
+using Serilog.Context;
+using Serilog.Events;
 
 using System.Text;
 
@@ -139,8 +141,61 @@ try
                          | ForwardedHeaders.XForwardedPrefix
     });
 
+    app.Use(async (context, next) =>
+    {
+        var token = context.Request.Headers["X-Correlation-ID"].FirstOrDefault()
+            ?? context.TraceIdentifier;
+
+        var metodo = $"{context.Request.Method} {context.Request.Path}";
+        const string capa = "Presentation";
+
+        context.Response.Headers["X-Correlation-ID"] = token;
+
+        using (LogContext.PushProperty("CorrelationId", token))
+        using (LogContext.PushProperty("Token", token))
+        using (LogContext.PushProperty("Metodo", metodo))
+        using (LogContext.PushProperty("Capa", capa))
+        {
+            await next();
+        }
+    });
+
     app.UseMiddleware<ExceptionMiddleware>();
-    app.UseSerilogRequestLogging();
+    app.UseSerilogRequestLogging(options =>
+    {
+        options.MessageTemplate = "Transaccion HTTP procesada";
+        options.GetLevel = (httpContext, _, exception) =>
+        {
+            if (exception is not null || httpContext.Response.StatusCode >= 500)
+            {
+                return LogEventLevel.Error;
+            }
+
+            if (httpContext.Response.StatusCode >= 400)
+            {
+                return LogEventLevel.Warning;
+            }
+
+            return LogEventLevel.Information;
+        };
+
+        options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+        {
+            var token = httpContext.Response.Headers["X-Correlation-ID"].ToString();
+            var metodo = $"{httpContext.Request.Method} {httpContext.Request.Path}";
+            var tipoTransaccion = httpContext.Response.StatusCode >= 500
+                ? "ERROR"
+                : httpContext.Response.StatusCode >= 400
+                    ? "WAR"
+                    : "OK";
+
+            diagnosticContext.Set("CorrelationId", token);
+            diagnosticContext.Set("Token", token);
+            diagnosticContext.Set("Metodo", metodo);
+            diagnosticContext.Set("Capa", "Presentation");
+            diagnosticContext.Set("TipoTransaccion", tipoTransaccion);
+        };
+    });
 
     // Swagger (todos los entornos — ajustar según política)
     app.UseSwaggerWithJwt();

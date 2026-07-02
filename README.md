@@ -141,3 +141,34 @@ Abre tu navegador e ingresa a `https://localhost:55831/swagger` para probar los 
 
 4. **Observacion:**
 Esto es una plantilla de proyecto, por lo cual deben revisar el appsetting para realizar los ajustes correspondiente como por ejemplo la cadena de conexión, la llave de JWT. 
+
+---
+
+## Estructura de Logs
+
+La plantilla define el formato base de logs con la siguiente estructura:
+
+```json
+{
+   "fecha": "2026-07-01 15:45:12.345 -05:00",
+   "token": "2f0fd32f-31af-4b7b-b4d2-6691832aa211",
+   "tipoTransaccion": "OK",
+   "metodo": "GET /api/clientes/1",
+   "capa": "Presentation",
+   "mensaje": "Transaccion HTTP procesada"
+}
+```
+
+Reglas de `tipoTransaccion`:
+
+* `OK`: Respuesta HTTP menor a 400.
+* `WAR`: Respuesta HTTP entre 400 y 499 o validaciones/reglas de negocio.
+* `ERROR`: Excepciones no controladas o respuesta HTTP mayor o igual a 500.
+
+Notas:
+
+* `token` corresponde al valor del encabezado `X-Correlation-ID` si existe; de lo contrario usa `TraceIdentifier`.
+* El archivo rota por hora en producción y por minuto en desarrollo para diagnóstico detallado.
+* En métodos públicos de Application, Infrastructure y Presentation se debe registrar log de inicio y log de fin del método.
+* En fin exitoso usar `tipoTransaccion = OK`; en escenarios controlados usar `WAR`; en fallas no controladas usar `ERROR`.
+* No registrar información sensible (claves, secretos, tokens completos o datos personales).

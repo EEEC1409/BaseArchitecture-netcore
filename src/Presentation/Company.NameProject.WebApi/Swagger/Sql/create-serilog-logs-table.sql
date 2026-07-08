@@ -1,22 +1,25 @@
 /*
-  Script base para el sink SQL de Serilog.
+  Script base para el sink SQL de Serilog en PostgreSQL.
   Ejecutar una sola vez en la base de datos destino antes de habilitar escritura en SQL.
 */
 
-IF OBJECT_ID('dbo.ApplicationLogs', 'U') IS NULL
-BEGIN
-    CREATE TABLE dbo.ApplicationLogs
-    (
-        Id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_ApplicationLogs PRIMARY KEY,
-        Message NVARCHAR(MAX) NULL,
-        MessageTemplate NVARCHAR(MAX) NULL,
-        Level NVARCHAR(128) NULL,
-        TimeStamp DATETIMEOFFSET NOT NULL,
-        Exception NVARCHAR(MAX) NULL,
-        Properties NVARCHAR(MAX) NULL,
-        LogEvent NVARCHAR(MAX) NULL
-    );
+CREATE TABLE IF NOT EXISTS public.application_logs
+(
+  id BIGSERIAL PRIMARY KEY,
+  message TEXT NULL,
+  message_template TEXT NULL,
+  level VARCHAR(128) NULL,
+  raise_date TIMESTAMPTZ NOT NULL,
+  exception TEXT NULL,
+  properties JSONB NULL,
+  token TEXT NULL,
+  tipo_transaccion TEXT NULL,
+  metodo TEXT NULL,
+  capa TEXT NULL
+);
 
-    CREATE INDEX IX_ApplicationLogs_TimeStamp ON dbo.ApplicationLogs(TimeStamp DESC);
-    CREATE INDEX IX_ApplicationLogs_Level ON dbo.ApplicationLogs(Level);
-END;
+CREATE INDEX IF NOT EXISTS ix_application_logs_raise_date
+  ON public.application_logs (raise_date DESC);
+
+CREATE INDEX IF NOT EXISTS ix_application_logs_level
+  ON public.application_logs (level);

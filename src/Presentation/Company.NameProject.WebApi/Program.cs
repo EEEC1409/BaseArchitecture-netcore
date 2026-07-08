@@ -18,8 +18,23 @@ using Steeltoe.Discovery.Eureka;
 using Serilog;
 using Serilog.Context;
 using Serilog.Events;
+using Serilog.Sinks.PostgreSQL;
+using Serilog.Sinks.PostgreSQL.ColumnWriters;
 
+using System.Collections.Generic;
 using System.Text;
+
+static bool IsPostgreSqlConnectionString(string? connectionString)
+{
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        return false;
+    }
+
+    return connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase)
+        && connectionString.Contains("Database=", StringComparison.OrdinalIgnoreCase)
+        && connectionString.Contains("Username=", StringComparison.OrdinalIgnoreCase);
+}
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -31,10 +46,49 @@ try
 
     // Serilog
     builder.Host.UseSerilog((ctx, services, config) =>
+    {
+        var connectionString = ctx.Configuration.GetConnectionString("DefaultConnection");
+        var serilogPostgreSqlConnectionString =
+            ctx.Configuration["Serilog:PostgreSql:ConnectionString"]
+            ?? ctx.Configuration.GetConnectionString("SerilogPostgreSql");
+
+        if (!IsPostgreSqlConnectionString(serilogPostgreSqlConnectionString)
+            && IsPostgreSqlConnectionString(connectionString))
+        {
+            serilogPostgreSqlConnectionString = connectionString;
+        }
+
+        var logTableName = ctx.Configuration["Serilog:PostgreSql:TableName"] ?? "application_logs";
+
         config.ReadFrom.Configuration(ctx.Configuration)
               .ReadFrom.Services(services)
               // Fallback para contenedores: garantiza salida a stdout/stderr
-              .WriteTo.Console());
+              .WriteTo.Console();
+
+        if (IsPostgreSqlConnectionString(serilogPostgreSqlConnectionString))
+        {
+            var columnWriters = new Dictionary<string, ColumnWriterBase>
+            {
+                ["message"] = new RenderedMessageColumnWriter(),
+                ["message_template"] = new MessageTemplateColumnWriter(),
+                ["level"] = new LevelColumnWriter(),
+                ["raise_date"] = new TimestampColumnWriter(),
+                ["exception"] = new ExceptionColumnWriter(),
+                ["properties"] = new LogEventSerializedColumnWriter(),
+                ["token"] = new SinglePropertyColumnWriter("Token"),
+                ["tipo_transaccion"] = new SinglePropertyColumnWriter("TipoTransaccion"),
+                ["metodo"] = new SinglePropertyColumnWriter("Metodo"),
+                ["capa"] = new SinglePropertyColumnWriter("Capa")
+            };
+
+            config.WriteTo.PostgreSQL(
+                connectionString: serilogPostgreSqlConnectionString!,
+                tableName: logTableName,
+                columnWriters: columnWriters,
+                needAutoCreateTable: false,
+                restrictedToMinimumLevel: LogEventLevel.Warning);
+        }
+    });
 
     // Layers
     builder.Services.AddApplication();

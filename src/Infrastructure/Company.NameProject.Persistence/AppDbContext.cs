@@ -1,9 +1,4 @@
-using Company.NameProject.Domain.Entities.Events;
-using Company.NameProject.Persistence.Entities;
-
 using Microsoft.EntityFrameworkCore;
-
-using System.Text.Json;
 
 namespace Company.NameProject.Persistence
 {
@@ -19,23 +14,12 @@ namespace Company.NameProject.Persistence
         // public DbSet<Cliente> Clientes { get; set; }
         // public DbSet<Vendedor> Vendedores { get; set; }
         // public DbSet<Pedido> Pedidos { get; set; }
-        public DbSet<OutboxMessage> Outbox { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // TODO: Configurar mapeos Fluent API por entidad al implementarlas.
             // Ejemplo:
             // modelBuilder.Entity<Cliente>(entity => { ... });
-
-            // OutboxMessage
-            modelBuilder.Entity<OutboxMessage>(entity =>
-            {
-                entity.ToTable("Outbox");
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Type).IsRequired();
-                entity.Property(e => e.Content).IsRequired();
-                entity.Property(e => e.OccurredOn).IsRequired();
-            });
         }
 
         public override int SaveChanges()
@@ -55,22 +39,6 @@ namespace Company.NameProject.Persistence
         {
             try
             {
-                var domainEvents = ChangeTracker.Entries<IHasDomainEvents>()
-                    .SelectMany(e => e.Entity.DomainEvents)
-                    .ToList();
-
-                foreach (var domainEvent in domainEvents)
-                {
-                    Outbox.Add(new OutboxMessage
-                    {
-                        Id = Guid.NewGuid(),
-                        OccurredOn = DateTime.UtcNow,
-                        Type = domainEvent.GetType().FullName!,
-                        Content = JsonSerializer.Serialize(domainEvent),
-                        Processed = false
-                    });
-                }
-
                 return await base.SaveChangesAsync(cancellationToken);
             }
             catch (DbUpdateException ex)

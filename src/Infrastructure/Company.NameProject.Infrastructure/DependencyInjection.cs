@@ -39,9 +39,6 @@ namespace Company.NameProject.Infrastructure
                 .AddSqlServer(connectionString, name: "sqlserver", tags: ["db", "ready"]);
 #endif
 
-            // Background services
-            services.AddHostedService<OutboxProcessorService>();
-
 #if (IncludeRabbit)
             // RabbitMQ Messaging
             services.Configure<RabbitMqSettings>(

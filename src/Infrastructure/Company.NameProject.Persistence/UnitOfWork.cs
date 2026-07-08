@@ -7,18 +7,15 @@ namespace Company.NameProject.Persistence
     public class UnitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _context;
-        private readonly DomainEventDispatcher _dispatcher;
         private IDbContextTransaction? _transaction;
 
-        public UnitOfWork(AppDbContext context, DomainEventDispatcher dispatcher)
+        public UnitOfWork(AppDbContext context)
         {
             _context = context;
-            _dispatcher = dispatcher;
         }
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            await _dispatcher.DispatchAsync();
             return await _context.SaveChangesAsync(cancellationToken);
         }
 

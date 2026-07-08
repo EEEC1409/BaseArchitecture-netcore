@@ -44,7 +44,6 @@ A continuación se detalla la estructura JSON exacta que debe devolver el endpoi
     "OK"
   ],
   "data": {
-    "existe": false,
     "id": 1,
     "usuario": "0920578762",
     "anio": 2026,
@@ -65,7 +64,9 @@ A continuación se detalla la estructura JSON exacta que debe devolver el endpoi
 ```
 
 ### Especificaciones del Objeto de Respuesta:
-* **`token`**: Un identificador único global (GUID) generado por la API para fines de trazabilidad y auditoría de la petición.
+* **`token`**: Identificador de trazabilidad de la petición. **OBLIGATORIO:** debe ser siempre el valor del header `X-Correlation-ID` recibido en el request — NO generar un `Guid.NewGuid()` propio. Esto garantiza que el `token` del JSON de respuesta, el header HTTP y los logs de Serilog sean idénticos y trazables de extremo a extremo.
+  * En controladores: `var token = Request.Headers["X-Correlation-ID"].FirstOrDefault();` → pasar a `ApiResponse<T>.Success(..., token: token)`.
+  * En middleware de excepciones: capturar `X-Correlation-ID` del contexto → pasar a `ApiResponse<T>.Fail(..., token: token)`.
 * **`statusCode`**: Código numérico de estado que refleja la correcta ejecución del canal de comunicación (en este escenario, se mantiene un `500` ya que ocurrió un error interno del servidor).
 * **`messages`**: Un arreglo de textos informativos. En casos donde no hay error técnico, se devolverá la confirmación estándar `["OK"]` o un mensaje personalizado según las reglas de negocio establecidas.
 * **`data`**: Cuerpo principal del resultado de la consulta. Al no existir el vendedor en la base de datos, este campo se establece estrictamente en **`null`**.

@@ -22,8 +22,6 @@ namespace Company.NameProject.Persistence
 #else
                 options.UseSqlServer(connectionString));
 #endif
-
-            services.AddScoped<DomainEventDispatcher>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;

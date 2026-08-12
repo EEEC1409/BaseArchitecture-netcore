@@ -40,7 +40,7 @@ namespace Company.NameProject.WebApi.Middleware
                     capa,
                     ex.Message);
 
-                await HandleExceptionAsync(context, ex.Message, 400);
+                await HandleExceptionAsync(context, ex.Message, 400, token);
             }
             catch (ValidationException ex)
             {
@@ -55,7 +55,7 @@ namespace Company.NameProject.WebApi.Middleware
                     capa,
                     string.Join(" | ", errors));
 
-                await HandleExceptionAsync(context, errors, 400);
+                await HandleExceptionAsync(context, errors, 400, token);
             }
             catch (ApiException ex)
             {
@@ -71,7 +71,7 @@ namespace Company.NameProject.WebApi.Middleware
                     capa,
                     ex.Message);
 
-                await HandleExceptionAsync(context, ex.Message, ex.StatusCode);
+                await HandleExceptionAsync(context, ex.Message, ex.StatusCode, token);
             }
             catch (Exception ex)
             {
@@ -84,18 +84,18 @@ namespace Company.NameProject.WebApi.Middleware
                     capa,
                     ex.Message);
 
-                await HandleExceptionAsync(context, "Error interno del servidor.", 500);
+                await HandleExceptionAsync(context, "Error interno del servidor.", 500, token);
             }
         }
 
-        private static async Task HandleExceptionAsync(HttpContext context, object message, int statusCode)
+        private static async Task HandleExceptionAsync(HttpContext context, object message, int statusCode, string token)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = statusCode;
 
             ApiResponse<object> response = message is List<string> errors
-                ? ApiResponse<object>.Fail(errors, statusCode)
-                : ApiResponse<object>.Fail(message.ToString()!, statusCode);
+                ? ApiResponse<object>.Fail(errors, statusCode, token)
+                : ApiResponse<object>.Fail(message.ToString()!, statusCode, token);
 
             await context.Response.WriteAsJsonAsync(response);
         }

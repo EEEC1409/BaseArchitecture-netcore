@@ -14,11 +14,11 @@ namespace Company.NameProject.Shared.Exceptions
         public T Data { get; set; }
 
         // ✅ SUCCESS
-        public static ApiResponse<T> Success(T data, string message = "OK", int statusCode = 200)
+        public static ApiResponse<T> Success(T data, string message = "OK", int statusCode = 200, string? token = null)
         {
             return new ApiResponse<T>
             {
-                Token = Guid.NewGuid().ToString(),
+                Token = token ?? Guid.NewGuid().ToString(),
                 StatusCode = statusCode,
                 Messages = new List<string> { message },
                 Data = data
@@ -26,11 +26,11 @@ namespace Company.NameProject.Shared.Exceptions
         }
 
         // ❌ FAIL (un mensaje)
-        public static ApiResponse<T> Fail(string message, int statusCode = 400)
+        public static ApiResponse<T> Fail(string message, int statusCode = 400, string? token = null)
         {
             return new ApiResponse<T>
             {
-                Token = Guid.NewGuid().ToString(),
+                Token = token ?? Guid.NewGuid().ToString(),
                 StatusCode = statusCode,
                 Messages = new List<string> { message },
                 Data = default
@@ -38,11 +38,11 @@ namespace Company.NameProject.Shared.Exceptions
         }
 
         // ❌ FAIL (varios mensajes)
-        public static ApiResponse<T> Fail(List<string> messages, int statusCode = 400)
+        public static ApiResponse<T> Fail(List<string> messages, int statusCode = 400, string? token = null)
         {
             return new ApiResponse<T>
             {
-                Token = Guid.NewGuid().ToString(),
+                Token = token ?? Guid.NewGuid().ToString(),
                 StatusCode = statusCode,
                 Messages = messages,
                 Data = default

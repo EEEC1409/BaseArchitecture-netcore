@@ -19,7 +19,6 @@ using Serilog;
 using Serilog.Context;
 using Serilog.Events;
 using Serilog.Sinks.PostgreSQL;
-using Serilog.Sinks.PostgreSQL.ColumnWriters;
 
 using System.Collections.Generic;
 using System.Text;
@@ -84,7 +83,7 @@ try
             config.WriteTo.PostgreSQL(
                 connectionString: serilogPostgreSqlConnectionString!,
                 tableName: logTableName,
-                columnWriters: columnWriters,
+                columnOptions: columnWriters,
                 needAutoCreateTable: false,
                 restrictedToMinimumLevel: LogEventLevel.Warning);
         }

@@ -34,7 +34,9 @@ dotnet new arquitectura-base -n "Cresa.XXXXXXX" --Company Cresa --ProjectName XX
 * **-n** Es el nombre de la carpeta que contendrá todo el proyecto
 * **--Company** nombre del empresa que va como prefijo
 * **--ProjectName** nombre del proyecto/aplicación a crear
-* **--DatabaseType** tipo de base de datos
+* **--DatabaseType** tipo de base de datos (`SQLServer` o `PostgreSQL`)
+* **--IncludeRabbit** `true`/`false` — incluye o excluye por completo la carpeta `Infrastructure/Messaging/` (IRabbitMqPublisher) en el proyecto generado
+* **--IncludeEureka** (opcional, default `false`) — agrega descubrimiento de servicios con Steeltoe/Eureka
 
 ### Resultado de Namespaces
 El motor de plantillas renombrará automáticamente todas las referencias:
@@ -48,7 +50,7 @@ El motor de plantillas renombrará automáticamente todas las referencias:
 
 ### Opción A: SQL Server sin RabbitMQ
 ```bash
-dotnet new arquitectura-base -n "Acme.Pagos" --Company Cresa --ProjectName Pagos --DatabaseType SQLServer --IncludeRabbit false
+dotnet new arquitectura-base -n "Cresa.Pagos" --Company Cresa --ProjectName Pagos --DatabaseType SQLServer --IncludeRabbit false
 ```
 
 ### Opción B: PostgreSQL con RabbitMQ
@@ -83,23 +85,22 @@ La plantilla implementa **Arquitectura Limpia (Clean Architecture)** separada po
 │   └── 📁 Company.NameProject.Shared          → Componentes transversales (sin dependencias de dominio)
 │       ├── 📁 Common/                         → PagedResult<T>, PaginationRequest
 │       ├── 📁 Exceptions/                     → ApiException, ApiResponse<T>
-│       └── 📁 Helpers/                        → DateTimeProvider
+│       └── 📁 Helpers/                        → DateHelper (DateTime.Now, hora local del contenedor)
 │
 ├── 📁 Infrastructure/
 │   ├── 📁 Company.NameProject.Infrastructure  → Servicios externos, repositorios concretos y mensajería
-│   │   ├── 📁 Messaging/                      → IRabbitMqPublisher, RabbitMqPublisher (opcional)
+│   │   ├── 📁 Messaging/                      → IRabbitMqPublisher, RabbitMqPublisher (opcional, según --IncludeRabbit)
 │   │   ├── 📁 Repositories/                   → GenericRepository<T>
-│   │   └── 📁 Services/                       → SystemDateTimeProvider, OutboxProcessorService
+│   │   └── 📁 Services/                       → SystemDateTimeProvider
 │   │
 │   └── 📁 Company.NameProject.Persistence     → Acceso a base de datos con EF Core
-│       ├── 📁 Entities/                       → OutboxMessage
-│       ├── AppDbContext.cs                    → DbContext principal + conversión de eventos a Outbox
-│       ├── UnitOfWork.cs                      → Gestión de transacciones
-│       └── DispatchDomainEvents.cs            → Serialización de eventos de dominio al Outbox
+│       ├── AppDbContext.cs                    → DbContext principal (DbSet/Fluent API se agregan por entidad)
+│       └── UnitOfWork.cs                      → Gestión de transacciones
 │
 └── 📁 Presentation/
     └── 📁 Company.NameProject.WebApi          → Punto de entrada HTTP (controllers, middlewares, auth)
         ├── 📁 Auth/                           → AuthController, JwtTokenService, LoginRequest/Response
+        ├── 📁 Controllers/                    → BaseApiController (base obligatoria de todo controlador — expone CorrelationToken)
         ├── 📁 Middleware/                     → ExceptionMiddleware (manejo global de errores)
         ├── 📁 Options/                        → JwtSettings
         └── Program.cs
@@ -118,15 +119,17 @@ La plantilla implementa **Arquitectura Limpia (Clean Architecture)** separada po
 
 > 💡 Los esqueletos de `CQRS/[NombreEntidad]/` en los tests están marcados con `[Skip]`.
 > Al implementar una nueva entidad, **duplica esa carpeta, renómbrala** e implementa cada caso de prueba.
+
+> ⚠️ **Patrón Transactional Outbox (opcional):** `OutboxMessage`, `DispatchDomainEvents.cs` y `OutboxProcessorService` **no vienen incluidos en la plantilla base** — no aparecen en el árbol de arriba porque no se generan por defecto. Se agregan manualmente solo si el microservicio necesita despachar Domain Events de forma asíncrona y resiliente a fallos (ej. notificar a un sistema externo tras persistir un agregado). Si tu proyecto no lo necesita, no hace falta incorporarlo.
 ---
 
 ## Ejecución Inicial
 
 Una vez creado el proyecto, compílalo y ejecútalo siguiendo estos comandos:
 
-1. **Navegar a la carpeta de la API:**
+1. **Navegar a la carpeta de la API** (el proyecto WebApi vive en `src/Presentation/`, no en la raíz de `src/`):
    ```bash
-   cd src/Acme.Pagos.API
+   cd src/Presentation/Cresa.Pagos.WebApi
    ```
 2. **Restaurar dependencias:**
    ```bash
@@ -136,11 +139,11 @@ Una vez creado el proyecto, compílalo y ejecútalo siguiendo estos comandos:
    ```bash
    dotnet run
    ```
-4. **Verificar Swagger:** 
-Abre tu navegador e ingresa a `https://localhost:55831/swagger` para probar los endpoints y autenticarte con JWT.
+4. **Verificar Swagger:**
+Abre tu navegador e ingresa a `https://localhost:55831/swagger` (puerto definido en `Properties/launchSettings.json`) para probar los endpoints y autenticarte con JWT.
 
-4. **Observacion:**
-Esto es una plantilla de proyecto, por lo cual deben revisar el appsetting para realizar los ajustes correspondiente como por ejemplo la cadena de conexión, la llave de JWT. 
+5. **Observación:**
+Esto es una plantilla de proyecto, por lo cual deben revisar el `appsettings` para realizar los ajustes correspondientes, como por ejemplo la cadena de conexión y la llave de JWT.
 
 ---
 

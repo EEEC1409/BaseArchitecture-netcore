@@ -1,4 +1,5 @@
 using Company.NameProject.Shared.Exceptions;
+using Company.NameProject.WebApi.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,10 +8,9 @@ namespace Company.NameProject.WebApi.Auth
     /// <summary>
     /// Gestiona la autenticación de usuarios y la emisión de tokens JWT.
     /// </summary>
-    [ApiController]
     [Route("api/auth")]
     [Produces("application/json")]
-    public class AuthController : ControllerBase
+    public class AuthController : BaseApiController
     {
         private readonly IJwtTokenService _tokenService;
 
@@ -45,7 +45,7 @@ namespace Company.NameProject.WebApi.Auth
 
             var response = _tokenService.GenerateToken(request.Username, roles);
 
-            return Ok(ApiResponse<LoginResponse>.Success(response, "Login exitoso."));
+            return Ok(ApiResponse<LoginResponse>.Success(response, "Login exitoso.", token: CorrelationToken));
         }
 
         private static bool IsValidUser(string username, string password, out List<string> roles)

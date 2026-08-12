@@ -265,6 +265,14 @@ try
 
     app.MapControllers();
     app.MapHealthChecks("/health");
+#if (IncludeEureka)
+    app.MapGet("/info", () => Results.Ok(new
+    {
+        app = "Company.NameProject.WebApi",
+        version = typeof(Program).Assembly.GetName().Version?.ToString(),
+        environment = app.Environment.EnvironmentName
+    }));
+#endif
 
     Log.Information("Iniciando Company.NameProject.WebApi...");
     app.Run();

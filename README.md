@@ -28,7 +28,7 @@ dotnet new install "ruta_descarga\BaseArchitecture-netcore"
 Para generar un nuevo proyecto con la configuración inicial estándar, ejecuta:
 
 ```bash
-dotnet new arquitectura-base -n "Cresa.XXXXXXX" --Company Cresa --ProjectName XXXXXXX --DatabaseType SQLServer --IncludeRabbit false
+dotnet new arquitectura-base -n "Cresa.XXXXXXX" --Company Cresa --ProjectName XXXXXXX --DatabaseType SQLServer --IncludeRabbit false --IncludeEureka true
 ```
 * arquitectura-base, este nombre esta en el template del proyecto base
 * **-n** Es el nombre de la carpeta que contendrá todo el proyecto
@@ -56,6 +56,11 @@ dotnet new arquitectura-base -n "Cresa.Pagos" --Company Cresa --ProjectName Pago
 ### Opción B: PostgreSQL con RabbitMQ
 ```bash
 dotnet new arquitectura-base -n "Acme.Inventario" --Company Acme --ProjectName Inventario --DatabaseType PostgreSQL --IncludeRabbit true
+```
+
+### Opción C: SQL Server con descubrimiento de servicios (Eureka)
+```bash
+dotnet new arquitectura-base -n "Cresa.Pagos" --Company Cresa --ProjectName Pagos --DatabaseType SQLServer --IncludeRabbit false --IncludeEureka true
 ```
 
 ---
@@ -144,6 +149,31 @@ Abre tu navegador e ingresa a `https://localhost:55831/swagger` (puerto definido
 
 5. **Observación:**
 Esto es una plantilla de proyecto, por lo cual deben revisar el `appsettings` para realizar los ajustes correspondientes, como por ejemplo la cadena de conexión y la llave de JWT.
+
+---
+
+## Construcción de Imagen Docker
+
+El `Dockerfile` de `src/Presentation/Company.NameProject.WebApi/` es **single-stage**: no compila el código dentro de la imagen, solo copia un artefacto ya publicado. Por eso el `dotnet publish` debe ejecutarse **antes** de `docker build`, dentro de la carpeta del proyecto WebApi.
+
+1. **Publicar el proyecto** (genera la carpeta `published/` junto al Dockerfile):
+   ```bash
+   cd src/Presentation/Cresa.Pagos.WebApi
+   dotnet publish -c Release -o published
+   ```
+2. **Construir la imagen:**
+   ```bash
+   docker build -t cresa-pagos-webapi .
+   ```
+   Parámetros opcionales (`--build-arg`):
+   * `TZ` — zona horaria del contenedor (default `UTC`, ej. `America/Guayaquil`)
+3. **Ejecutar el contenedor:**
+   ```bash
+   docker run -p 8080:8080 -e ASPNETCORE_URLS=http://+:8080 cresa-pagos-webapi
+   ```
+   El Dockerfile expone `ASPNETCORE_URLS=http://+:0` por defecto (puerto asignado dinámicamente), pensado para orquestadores (Swarm/Kubernetes) o cuando `--IncludeEureka true` — `Program.cs` detecta el puerto real asignado y lo registra en Eureka. Para exponerlo en un puerto fijo local, sobrescribe `ASPNETCORE_URLS` como en el ejemplo anterior.
+
+> ⚠️ Automatiza el paso de `dotnet publish` en tu pipeline CI/CD (GitHub Actions, Azure DevOps, etc.) antes de invocar `docker build` — este repositorio no incluye workflows de CI por defecto.
 
 ---
 

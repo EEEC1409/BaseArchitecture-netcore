@@ -1,27 +1,31 @@
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 0
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["src/Presentation/Company.NameProject.WebApi/Company.NameProject.WebApi.csproj", "src/Presentation/Company.NameProject.WebApi/"]
-COPY ["src/Core/Company.NameProject.Application/Company.NameProject.Application.csproj", "src/Core/Company.NameProject.Application/"]
-COPY ["src/Core/Company.NameProject.Domain/Company.NameProject.Domain.csproj", "src/Core/Company.NameProject.Domain/"]
-COPY ["src/Core/Company.NameProject.Shared/Company.NameProject.Shared.csproj", "src/Core/Company.NameProject.Shared/"]
-COPY ["src/Infrastructure/Company.NameProject.Infrastructure/Company.NameProject.Infrastructure.csproj", "src/Infrastructure/Company.NameProject.Infrastructure/"]
-COPY ["src/Infrastructure/Company.NameProject.Persistence/Company.NameProject.Persistence.csproj", "src/Infrastructure/Company.NameProject.Persistence/"]
-RUN dotnet restore "src/Presentation/Company.NameProject.WebApi/Company.NameProject.WebApi.csproj"
-COPY . .
-WORKDIR "/src/src/Presentation/Company.NameProject.WebApi"
-RUN dotnet build "Company.NameProject.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
+# ===================================================
+# INSTALACIÓN DE LIBRERÍAS REQUERIDAS POR PUPPETEER (CHROMIUM)
+# ===================================================
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    chromium \
+    fonts-liberation \
+    tzdata \
+    && rm -rf /var/lib/apt/lists/*
+# ===================================================
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV CHROMIUM_PATH=/usr/bin/chromium
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "Company.NameProject.WebApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# Zona horaria del contenedor (configurable con --build-arg TZ=America/Guayaquil)
+ARG TZ=UTC
+ENV TZ=${TZ}
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+# Copia tu publicación
+COPY published/ ./
+
+# COPIA el folder env (muy importante)
+#COPY env/ ./env/
+
+# Con esto ASP.NET encontrará appsettings.{ASPNETCORE_ENVIRONMENT}.json dentro del contenedor
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_URLS=http://+:0
 ENTRYPOINT ["dotnet", "Company.NameProject.WebApi.dll"]
